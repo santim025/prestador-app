@@ -2,56 +2,87 @@
 
 Una aplicación moderna para la gestión de préstamos personales, diseñada para facilitar el seguimiento de clientes, créditos y pagos.
 
-## 🚀 Características
+## � Dashboard
 
-- **Dashboard Interactivo:** Visualiza KPIs financieros clave como Capital Disponible, Capital Prestado, Ganancias Totales y Crecimiento Mensual.
-- **Gestión de Clientes:** Registra y administra la información de tus clientes.
-- **Control de Préstamos:** Crea nuevos préstamos y lleva un registro detallado de los mismos.
-- **Seguimiento de Pagos:** Registra pagos mensuales y visualiza el historial de transacciones.
-- **Gestión de Capital:** Administra tu capital inicial y observa cómo crece con los intereses ganados.
-- **Seguridad:** Autenticación robusta y protección de datos mediante Supabase.
+El dashboard es tu centro de control financiero. Aquí encontrarás:
 
-## 🛠️ Tecnologías Utilizadas
+- **Capital Disponible:** Muestra cuánto dinero tienes disponible para prestar (tu capital inicial más intereses ganados, menos lo que está prestado actualmente).
+- **Capital Prestado:** Total de dinero que tienes actualmente en préstamos activos.
+- **Ganancias Totales:** Suma de todos los intereses que has ganado hasta la fecha.
+- **Crecimiento:** Porcentaje de crecimiento de tu capital respecto al inicial.
+- **Gráfico Mensual:** Visualiza tus ganancias mes a mes.
 
-- **Frontend:** [Next.js](https://nextjs.org/) (App Router), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/).
-- **Estilos:** [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/), [Lucide React](https://lucide.dev/) (Iconos).
-- **Backend & Base de Datos:** [Supabase](https://supabase.com/) (PostgreSQL, Auth).
-- **Gestor de Paquetes:** pnpm.
+## 👥 Gestión de Clientes
 
-## 📦 Instalación y Configuración
+### Agregar un Cliente
 
-1.  **Clonar el repositorio:**
+1.  Ve a la sección **Clientes** desde el menú lateral.
+2.  Haz clic en **Agregar Cliente**.
+3.  Completa el formulario con:
+    - Nombre completo
+    - Número de teléfono
+    - Dirección
+    - URL de imagen de pagare (opcional)
+4.  Guarda el cliente.
 
-    ```bash
-    git clone https://github.com/santim025/prestador-app.git
-    cd prestador-app
-    ```
+### Ver Clientes
 
-2.  **Instalar dependencias:**
+Todos tus clientes aparecen en una lista con su información básica y el total de préstamos activos que tienen.
 
-    ```bash
-    pnpm install
-    ```
+## 💰 Gestión de Préstamos
 
-3.  **Configurar variables de entorno:**
-    Crea un archivo `.env.local` en la raíz del proyecto y agrega tus credenciales de Supabase:
+### Crear un Préstamo
 
-    ```env
-    NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
-    ```
+1.  Ve a la sección **Préstamos**.
+2.  Haz clic en **Nuevo Préstamo**.
+3.  Selecciona el cliente (debe estar registrado previamente).
+4.  Ingresa:
+    - Monto del préstamo
+    - Tasa de interés mensual (%)
+    - Número de meses
+5.  El sistema calculará automáticamente:
+    - Cuota mensual
+    - Total de intereses
+    - Total a pagar
+6.  Confirma y el préstamo se creará con todos los pagos mensuales programados.
 
-4.  **Ejecutar el servidor de desarrollo:**
-    ```bash
-    pnpm dev
-    ```
-    Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+### Ver Préstamos
 
-## 🚀 Despliegue
+- **Activos:** Préstamos que aún tienen pagos pendientes.
+- **Completados:** Préstamos totalmente pagados.
+- Cada préstamo muestra el progreso de pagos y el saldo pendiente.
 
-Este proyecto está optimizado para ser desplegado en **Vercel**.
+## 💳 Gestión de Pagos
 
-1.  Sube tu código a GitHub.
-2.  Importa el proyecto en Vercel.
-3.  Configura las variables de entorno (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) en el panel de Vercel.
-4.  ¡Despliega!
+### Registrar un Pago
+
+1.  Ve a la sección **Pagos**.
+2.  Busca el pago pendiente del mes correspondiente.
+3.  Haz clic en **Marcar como Pagado**.
+4.  El sistema automáticamente:
+    - Actualiza el estado del pago
+    - Suma el interés a tus ganancias totales
+    - Genera el siguiente pago mensual si quedan cuotas
+
+### Ver Historial
+
+- **Pendientes:** Pagos que aún no se han recibido.
+- **Completados:** Historial de todos los pagos recibidos.
+
+## 💼 Gestión de Capital
+
+1.  Ve a la sección **Capital**.
+2.  Aquí puedes:
+    - Ver tu capital inicial
+    - Ver tu capital actual (inicial + intereses ganados)
+    - Actualizar tu capital inicial si realizas nuevas inversiones
+3.  El sistema calcula automáticamente:
+    - Total de intereses ganados
+    - Porcentaje de crecimiento
+    - Capital disponible para nuevos préstamos
+
+## 🔐 Seguridad
+
+- Todos los datos están protegidos con autenticación de Supabase.
+- Cada usuario solo puede ver y gestionar sus propios datos.
+- Las sesiones se mantienen seguras mediante tokens encriptados.
