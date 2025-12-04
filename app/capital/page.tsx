@@ -5,7 +5,6 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -110,11 +109,10 @@ export default function CapitalPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <DashboardNav />
-      <DashboardHeader />
 
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold">Mi Capital</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

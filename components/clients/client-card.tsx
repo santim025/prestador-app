@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import Image from "next/image"
+import { User, Phone, MapPin, Trash2 } from "lucide-react"
 
 interface Client {
   id: string
@@ -46,13 +47,23 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{client.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+      <CardContent className="p-0">
+        {/* Header con avatar e info principal */}
+        <div className="p-5 border-b border-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <User className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-lg text-gray-900 truncate">{client.name}</h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Imagen del pagaré si existe */}
         {client.payage_image_url && (
-          <div className="relative w-full h-40 bg-muted rounded-md overflow-hidden">
+          <div className="relative w-full h-32 bg-muted">
             <Image
               src={client.payage_image_url || "/placeholder.svg"}
               alt={`Pagaré de ${client.name}`}
@@ -62,32 +73,45 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
           </div>
         )}
 
-        <div className="space-y-2 text-sm">
-          <p>
-            <span className="font-semibold">Celular:</span> {client.phone_number}
-          </p>
-          <p>
-            <span className="font-semibold">Dirección:</span> {client.address}
-          </p>
+        {/* Información de contacto */}
+        <div className="p-5 space-y-3">
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            <Phone className="h-4 w-4 text-gray-400" />
+            <span>{client.phone_number}</span>
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            <MapPin className="h-4 w-4 text-gray-400" />
+            <span className="truncate">{client.address}</span>
+          </div>
         </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" className="w-full" disabled={isDeleting}>
-              Eliminar
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Eliminar cliente</AlertDialogTitle>
-              <AlertDialogDescription>
-                ¿Estás seguro de que deseas eliminar a {client.name}? Esta acción no se puede deshacer.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Eliminar</AlertDialogAction>
-          </AlertDialogContent>
-        </AlertDialog>
+        {/* Acciones */}
+        <div className="px-5 pb-5">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" 
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Eliminar
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Eliminar cliente</AlertDialogTitle>
+                <AlertDialogDescription>
+                  ¿Estás seguro de que deseas eliminar a {client.name}? Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </CardContent>
     </Card>
   )

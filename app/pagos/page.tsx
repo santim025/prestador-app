@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { DashboardNav } from "@/components/dashboard/dashboard-nav"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PaymentCard } from "@/components/payments/payment-card"
@@ -60,11 +59,10 @@ export default function PagosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <DashboardNav />
-      <DashboardHeader />
 
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold">Registro de Pagos</h2>
 
         {/* Summary Cards */}

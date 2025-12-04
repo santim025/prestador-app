@@ -4,8 +4,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -15,7 +13,6 @@ import {
   Line,
 } from "recharts";
 import { Wallet, HandCoins, TrendingUp, Activity } from "lucide-react";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 
 interface CapitalData {
@@ -147,24 +144,23 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <DashboardNav />
-      <div className="flex">
-        <main className="flex-1">
-          <DashboardHeader />
-
-          <div className="space-y-6 p-6">
+      <main className="flex-1">
+        <div className="space-y-4 p-4 max-w-7xl mx-auto">
             {/* KPI Cards */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card className="shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                <CardHeader className="flex flex-col items-center space-y-0 pb-2 pt-4">
+                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
+                    <Wallet className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-xs font-medium text-gray-600">
                     Capital Disponible
                   </CardTitle>
-                  <Wallet className="h-5 w-5 text-emerald-500" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-emerald-500 tabular-nums">
+                <CardContent className="text-center pb-4">
+                  <div className="text-2xl font-bold text-emerald-600 tabular-nums">
                     $
                     {availableCapital.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
@@ -175,14 +171,16 @@ export default function DashboardPage() {
               </Card>
 
               <Card className="shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                <CardHeader className="flex flex-col items-center space-y-0 pb-2 pt-4">
+                  <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
+                    <HandCoins className="h-6 w-6 text-red-600" />
+                  </div>
+                  <CardTitle className="text-xs font-medium text-gray-600">
                     Capital Prestado
                   </CardTitle>
-                  <HandCoins className="h-5 w-5 text-red-500" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-red-500 tabular-nums">
+                <CardContent className="text-center pb-4">
+                  <div className="text-2xl font-bold text-red-600 tabular-nums">
                     $
                     {totalLent.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
@@ -195,14 +193,16 @@ export default function DashboardPage() {
               </Card>
 
               <Card className="shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                <CardHeader className="flex flex-col items-center space-y-0 pb-2 pt-4">
+                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                    <TrendingUp className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xs font-medium text-gray-600">
                     Ganancias Totales
                   </CardTitle>
-                  <TrendingUp className="h-5 w-5 text-blue-500" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-blue-500 tabular-nums">
+                <CardContent className="text-center pb-4">
+                  <div className="text-2xl font-bold text-blue-600 tabular-nums">
                     $
                     {totalEarnings.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
@@ -215,14 +215,16 @@ export default function DashboardPage() {
               </Card>
 
               <Card className="shadow-sm hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                <CardHeader className="flex flex-col items-center space-y-0 pb-2 pt-4">
+                  <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                    <Activity className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <CardTitle className="text-xs font-medium text-gray-600">
                     Crecimiento
                   </CardTitle>
-                  <Activity className="h-5 w-5 text-gray-600" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-gray-900 tabular-nums">
+                <CardContent className="text-center pb-4">
+                  <div className="text-2xl font-bold text-gray-900 tabular-nums">
                     {growthPercentage.toFixed(1)}%
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
@@ -232,58 +234,50 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            {/* Charts */}
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ganancias Mensuales</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={monthlyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value) =>
-                          `$${Number(value).toLocaleString("es-CO")}`
-                        }
-                      />
-                      <Bar dataKey="earnings" fill="#3b82f6" name="Ganancias" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Capital en Tiempo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={monthlyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value) =>
-                          `$${Number(value).toLocaleString("es-CO")}`
-                        }
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="capital"
-                        stroke="#10b981"
-                        name="Capital"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </main>
-      </div>
+            {/* Chart - Gráfico de Líneas */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Ganancias Mensuales</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-4">
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "#6b7280", fontSize: 12 }}
+                      axisLine={{ stroke: "#e5e7eb" }}
+                    />
+                    <YAxis
+                      tick={{ fill: "#6b7280", fontSize: 12 }}
+                      axisLine={{ stroke: "#e5e7eb" }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip
+                      formatter={(value) =>
+                        `$${Number(value).toLocaleString("es-CO")}`
+                      }
+                      contentStyle={{
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="earnings"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      name="Ganancias"
+                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, fill: "#3b82f6" }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+        </div>
+      </main>
     </div>
   );
 }

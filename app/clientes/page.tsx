@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { DashboardNav } from "@/components/dashboard/dashboard-nav"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -53,11 +52,10 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <DashboardNav />
-      <DashboardHeader />
 
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold">Clientes</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
