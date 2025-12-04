@@ -155,79 +155,77 @@ export default function DashboardPage() {
 
           <div className="space-y-6 p-6">
             {/* KPI Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Capital Disponible
                   </CardTitle>
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
+                  <Wallet className="h-5 w-5 text-emerald-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-3xl font-bold text-emerald-500 tabular-nums">
                     $
                     {availableCapital.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Dinero en caja
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Dinero en caja</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Capital Prestado
                   </CardTitle>
-                  <HandCoins className="h-4 w-4 text-muted-foreground" />
+                  <HandCoins className="h-5 w-5 text-red-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-600">
+                  <div className="text-3xl font-bold text-red-500 tabular-nums">
                     $
                     {totalLent.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-500 mt-1">
                     En manos de clientes
                   </p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Ganancias Totales
                   </CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <TrendingUp className="h-5 w-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-3xl font-bold text-blue-500 tabular-nums">
                     $
                     {totalEarnings.toLocaleString("es-CO", {
                       minimumFractionDigits: 0,
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-500 mt-1">
                     Intereses generados
                   </p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium text-gray-600">
                     Crecimiento
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <Activity className="h-5 w-5 text-gray-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-3xl font-bold text-gray-900 tabular-nums">
                     {growthPercentage.toFixed(1)}%
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-500 mt-1">
                     Desde capital inicial
                   </p>
                 </CardContent>
