@@ -86,3 +86,5 @@ Todos tus clientes aparecen en una lista con su información básica y el total 
 - Todos los datos están protegidos con autenticación de Supabase.
 - Cada usuario solo puede ver y gestionar sus propios datos.
 - Las sesiones se mantienen seguras mediante tokens encriptados.
+
+<!-- v1.0.1 -->
