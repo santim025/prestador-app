@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # ---- Base ----
 FROM node:20-alpine AS base
 RUN apk add --no-cache libc6-compat openssl
@@ -13,8 +11,8 @@ COPY prisma ./prisma/
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies (without frozen-lockfile for flexibility)
+RUN pnpm install
 
 # ---- Builder ----
 FROM base AS builder
@@ -32,11 +30,6 @@ RUN npx prisma generate
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-
-# Build arguments for environment variables needed at build time
-ARG DATABASE_URL
-ARG NEXTAUTH_SECRET
-ARG NEXTAUTH_URL
 
 RUN pnpm build
 
