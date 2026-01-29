@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +18,7 @@ import { Label } from "@/components/ui/label";
 
 interface Capital {
   id: string;
-  initial_capital: number;
+  initialCapital: number;
 }
 
 export default function CapitalPage() {
@@ -35,39 +34,29 @@ export default function CapitalPage() {
   }, []);
 
   const fetchCapitalData = async () => {
-    const supabase = createClient();
+    try {
+      // Fetch capital
+      const capitalResponse = await fetch("/api/capital");
+      if (capitalResponse.ok) {
+        const capitalData = await capitalResponse.json();
+        setCapital(capitalData);
+        setNewInitialCapital(capitalData?.initialCapital?.toString() || "0");
+      }
 
-    // Obtener capital inicial
-    const { data: capitalData, error: capitalError } = await supabase
-      .from("users_capital")
-      .select("*")
-      .single();
-
-    if (capitalError) {
-      console.error("Error fetching capital:", capitalError);
-    } else {
-      setCapital(capitalData);
-      setNewInitialCapital(capitalData.initial_capital.toString());
+      // Fetch payments to calculate total interest
+      const paymentsResponse = await fetch("/api/payments");
+      if (paymentsResponse.ok) {
+        const paymentsData = await paymentsResponse.json();
+        const total = paymentsData
+          .filter((p: any) => p.was_paid)
+          .reduce((sum: number, p: any) => sum + Number(p.interest_earned), 0);
+        setTotalInterestEarned(total);
+      }
+    } catch (error) {
+      console.error("Error fetching capital data:", error);
+    } finally {
+      setLoading(false);
     }
-
-    // Calcular total de intereses cobrados (solo pagos realizados)
-    const { data: paymentsData, error: paymentsError } = await supabase
-      .from("payments")
-      .select("interest_earned")
-      .eq("was_paid", true);
-
-    if (paymentsError) {
-      console.error("Error fetching payments:", paymentsError);
-    } else {
-      const total =
-        paymentsData?.reduce(
-          (sum, payment) => sum + Number(payment.interest_earned),
-          0
-        ) || 0;
-      setTotalInterestEarned(total);
-    }
-
-    setLoading(false);
   };
 
   const handleUpdateInitialCapital = async (e: React.FormEvent) => {
@@ -75,13 +64,15 @@ export default function CapitalPage() {
     setIsUpdating(true);
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("users_capital")
-        .update({ initial_capital: Number.parseFloat(newInitialCapital) })
-        .eq("id", capital!.id);
+      const response = await fetch("/api/capital", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ initialCapital: parseFloat(newInitialCapital) }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error("Error updating capital");
 
       setIsDialogOpen(false);
       fetchCapitalData();
@@ -101,11 +92,12 @@ export default function CapitalPage() {
   }
 
   // Calcular el capital actual: capital inicial + intereses ganados
-  const currentCapital = (capital?.initial_capital || 0) + totalInterestEarned;
+  const initialCapitalValue = Number(capital?.initialCapital || 0);
+  const currentCapital = initialCapitalValue + totalInterestEarned;
 
   // Calcular el crecimiento basado en los intereses ganados
-  const growth = capital?.initial_capital
-    ? (totalInterestEarned / capital.initial_capital) * 100
+  const growth = initialCapitalValue
+    ? (totalInterestEarned / initialCapitalValue) * 100
     : 0;
 
   return (
@@ -159,7 +151,7 @@ export default function CapitalPage() {
             <CardContent>
               <div className="text-2xl font-bold">
                 $
-                {capital?.initial_capital?.toLocaleString("es-CO", {
+                {initialCapitalValue.toLocaleString("es-CO", {
                   minimumFractionDigits: 0,
                 })}
               </div>

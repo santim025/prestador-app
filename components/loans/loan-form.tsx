@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,11 +26,11 @@ interface LoanFormProps {
 export function LoanForm({ onSuccess }: LoanFormProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [formData, setFormData] = useState({
-    client_id: "",
-    principal_amount: "",
-    interest_rate: "",
-    start_date: new Date().toISOString().split("T")[0],
-    payment_frequency_days: "30",
+    clientId: "",
+    principalAmount: "",
+    interestRate: "",
+    startDate: new Date().toISOString().split("T")[0],
+    paymentFrequencyDays: "30",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,16 +40,13 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
   }, []);
 
   const fetchClients = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("clients")
-      .select("id, name")
-      .order("name", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching clients:", error);
-    } else {
+    try {
+      const response = await fetch("/api/clients");
+      if (!response.ok) throw new Error("Error fetching clients");
+      const data = await response.json();
       setClients(data || []);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
     }
   };
 
@@ -75,62 +71,23 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
     setError(null);
 
     try {
-      const supabase = createClient();
+      const response = await fetch("/api/loans", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          clientId: formData.clientId,
+          principalAmount: parseFloat(formData.principalAmount),
+          interestRate: parseFloat(formData.interestRate),
+          startDate: formData.startDate,
+          paymentFrequencyDays: formData.paymentFrequencyDays,
+        }),
+      });
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Usuario no autenticado");
-
-      // Create the loan
-      const { data: loanData, error: loanError } = await supabase
-        .from("loans")
-        .insert({
-          user_id: user.id,
-          client_id: formData.client_id,
-          principal_amount: Number.parseFloat(formData.principal_amount),
-          interest_rate: Number.parseFloat(formData.interest_rate),
-          start_date: formData.start_date,
-          payment_frequency_days: Number.parseInt(
-            formData.payment_frequency_days
-          ),
-          status: "active",
-        })
-        .select()
-        .single();
-
-      if (loanError) throw loanError;
-
-      // Create the first month's payment record
-      if (loanData) {
-        const monthlyInterest =
-          (Number.parseFloat(formData.principal_amount) *
-            Number.parseFloat(formData.interest_rate)) /
-          100;
-
-        // Calcular el primer día del siguiente mes de forma segura
-        // Usamos split para obtener año, mes y día tal cual los ingresó el usuario
-        const [year, month, day] = formData.start_date.split("-").map(Number);
-        // Creamos la fecha usando componentes locales (mes es 0-indexado, así que month - 1)
-        // Pero queremos el siguiente mes, así que usamos (month - 1) + 1 = month
-        const nextMonthDate = new Date(year, month, 1);
-
-        // Formatear a YYYY-MM-DD usando componentes locales para evitar UTC shift
-        const yyyy = nextMonthDate.getFullYear();
-        const mm = String(nextMonthDate.getMonth() + 1).padStart(2, "0");
-        const dd = String(nextMonthDate.getDate()).padStart(2, "0");
-        const paymentMonth = `${yyyy}-${mm}-${dd}`;
-
-        const { error: paymentError } = await supabase.from("payments").insert({
-          user_id: user.id,
-          loan_id: loanData.id,
-          payment_month: paymentMonth,
-          interest_earned: monthlyInterest,
-          was_paid: false,
-        });
-
-        if (paymentError) throw paymentError;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Error al crear préstamo");
       }
 
       onSuccess();
@@ -145,10 +102,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="client_id">Cliente</Label>
+        <Label htmlFor="clientId">Cliente</Label>
         <Select
-          value={formData.client_id}
-          onValueChange={(value) => handleSelectChange("client_id", value)}
+          value={formData.clientId}
+          onValueChange={(value) => handleSelectChange("clientId", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Selecciona un cliente" />
@@ -164,13 +121,13 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="principal_amount">Monto del Préstamo</Label>
+        <Label htmlFor="principalAmount">Monto del Préstamo</Label>
         <Input
-          id="principal_amount"
-          name="principal_amount"
+          id="principalAmount"
+          name="principalAmount"
           type="number"
           placeholder="1000000"
-          value={formData.principal_amount}
+          value={formData.principalAmount}
           onChange={handleInputChange}
           required
           disabled={isLoading}
@@ -179,13 +136,13 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="interest_rate">Tasa de Interés Mensual (%)</Label>
+        <Label htmlFor="interestRate">Tasa de Interés Mensual (%)</Label>
         <Input
-          id="interest_rate"
-          name="interest_rate"
+          id="interestRate"
+          name="interestRate"
           type="number"
           placeholder="5"
-          value={formData.interest_rate}
+          value={formData.interestRate}
           onChange={handleInputChange}
           required
           disabled={isLoading}
@@ -194,12 +151,12 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="start_date">Fecha de Inicio</Label>
+        <Label htmlFor="startDate">Fecha de Inicio</Label>
         <Input
-          id="start_date"
-          name="start_date"
+          id="startDate"
+          name="startDate"
           type="date"
-          value={formData.start_date}
+          value={formData.startDate}
           onChange={handleInputChange}
           required
           disabled={isLoading}
@@ -207,13 +164,13 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="payment_frequency_days">
+        <Label htmlFor="paymentFrequencyDays">
           Frecuencia de Pago (días)
         </Label>
         <Select
-          value={formData.payment_frequency_days}
+          value={formData.paymentFrequencyDays}
           onValueChange={(value) =>
-            handleSelectChange("payment_frequency_days", value)
+            handleSelectChange("paymentFrequencyDays", value)
           }
         >
           <SelectTrigger>

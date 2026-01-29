@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -23,106 +22,47 @@ interface CapitalData {
 interface MonthlyData {
   month: string;
   earnings: number;
-  capital: number;
+}
+
+interface DashboardData {
+  capital: CapitalData;
+  totalLent: number;
+  monthlyData: MonthlyData[];
+  totalInterests: number;
 }
 
 export default function DashboardPage() {
-  const [capital, setCapital] = useState<CapitalData | null>(null);
-  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
-  const [totalLent, setTotalLent] = useState(0);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const supabase = createClient();
-
-      // Get user capital
-      const { data: capitalData, error: capitalError } = await supabase
-        .from("users_capital")
-        .select("*")
-        .single();
-
-      if (capitalError) {
-        console.error("Error fetching capital:", capitalError);
+      try {
+        const response = await fetch("/api/dashboard");
+        if (!response.ok) throw new Error("Error fetching data");
+        const dashboardData = await response.json();
+        setData(dashboardData);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      // Get active loans to calculate lent capital
-      const { data: loansData, error: loansError } = await supabase
-        .from("loans")
-        .select("principal_amount")
-        .eq("status", "active");
-
-      if (loansError) {
-        console.error("Error fetching loans:", loansError);
-      }
-
-      const calculatedTotalLent =
-        loansData?.reduce(
-          (sum, loan) => sum + Number(loan.principal_amount),
-          0
-        ) || 0;
-      setTotalLent(calculatedTotalLent);
-
-      // Get monthly earnings from payments
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from("payments")
-        .select("payment_month, interest_earned, was_paid")
-        .order("payment_month", { ascending: false })
-        .limit(12);
-
-      if (paymentsError) {
-        console.error("Error fetching payments:", paymentsError);
-        setLoading(false);
-        return;
-      }
-
-      // Group by month
-      const monthMap = new Map<string, number>();
-      let totalInterests = 0;
-
-      paymentsData?.forEach((payment) => {
-        if (payment.was_paid) {
-          const month = new Date(payment.payment_month).toLocaleDateString(
-            "es-ES",
-            {
-              month: "short",
-              year: "numeric",
-            }
-          );
-          const interest = Number(payment.interest_earned);
-          monthMap.set(month, (monthMap.get(month) || 0) + interest);
-          totalInterests += interest;
-        }
-      });
-
-      // Calculate total assets (Initial + Interest)
-      const totalAssets = (capitalData.initial_capital || 0) + totalInterests;
-
-      // Update capital state with calculated value (Total Assets)
-      setCapital({
-        ...capitalData,
-        current_capital: totalAssets,
-      });
-
-      const data = Array.from(monthMap, ([month, earnings]) => ({
-        month,
-        earnings: Number.parseFloat(earnings.toFixed(2)),
-        capital: totalAssets,
-      })).reverse();
-
-      setMonthlyData(data.length > 0 ? data : generateMockData());
-      setLoading(false);
     };
 
     fetchData();
   }, []);
 
-  const generateMockData = (): MonthlyData[] => {
-    return [];
-  };
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
+  const capital = data?.capital;
+  const totalLent = data?.totalLent || 0;
+  const monthlyData = data?.monthlyData || [];
   const totalEarnings = monthlyData.reduce((sum, m) => sum + m.earnings, 0);
 
   // Calculate growth based on dynamic values
@@ -134,14 +74,6 @@ export default function DashboardPage() {
 
   // Calculate available capital for display
   const availableCapital = (capital?.current_capital || 0) - totalLent;
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Cargando...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

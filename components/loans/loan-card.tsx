@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -40,35 +39,45 @@ export function LoanCard({ loan, onUpdate }: LoanCardProps) {
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
+    try {
+      const response = await fetch(`/api/loans/${loan.id}`, {
+        method: "DELETE",
+      })
 
-    // Delete associated payments first
-    await supabase.from("payments").delete().eq("loan_id", loan.id)
-
-    // Then delete the loan
-    const { error } = await supabase.from("loans").delete().eq("id", loan.id)
-
-    if (error) {
+      if (!response.ok) {
+        console.error("Error deleting loan")
+      } else {
+        onUpdate()
+      }
+    } catch (error) {
       console.error("Error deleting loan:", error)
-    } else {
-      onUpdate()
+    } finally {
+      setIsDeleting(false)
     }
-    setIsDeleting(false)
   }
 
   const handleStatusChange = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
-    const newStatus = loan.status === "active" ? "completed" : "active"
+    try {
+      const newStatus = loan.status === "active" ? "completed" : "active"
+      const response = await fetch(`/api/loans/${loan.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
 
-    const { error } = await supabase.from("loans").update({ status: newStatus }).eq("id", loan.id)
-
-    if (error) {
+      if (!response.ok) {
+        console.error("Error updating loan")
+      } else {
+        onUpdate()
+      }
+    } catch (error) {
       console.error("Error updating loan:", error)
-    } else {
-      onUpdate()
+    } finally {
+      setIsDeleting(false)
     }
-    setIsDeleting(false)
   }
 
   return (

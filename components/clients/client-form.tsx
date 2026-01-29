@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +15,7 @@ interface ClientFormProps {
 export function ClientForm({ onSuccess }: ClientFormProps) {
   const [formData, setFormData] = useState({
     name: "",
-    phone_number: "",
+    phoneNumber: "",
     address: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -50,12 +49,12 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
 
       // Upload image if provided
       if (imageFile) {
-        const formData = new FormData();
-        formData.append("file", imageFile);
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", imageFile);
 
         const uploadResponse = await fetch("/api/upload", {
           method: "POST",
-          body: formData,
+          body: uploadFormData,
         });
 
         if (!uploadResponse.ok) {
@@ -67,24 +66,23 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
       }
 
       // Save client to database
-      // Save client to database
-      const supabase = createClient();
-
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Usuario no autenticado");
-
-      const { error: insertError } = await supabase.from("clients").insert({
-        user_id: user.id,
-        name: formData.name,
-        phone_number: formData.phone_number,
-        address: formData.address,
-        payage_image_url: imageUrl,
+      const response = await fetch("/api/clients", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          address: formData.address,
+          payageImageUrl: imageUrl,
+        }),
       });
 
-      if (insertError) throw insertError;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Error al crear cliente");
+      }
 
       onSuccess();
     } catch (err) {
@@ -110,12 +108,12 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone_number">Celular</Label>
+        <Label htmlFor="phoneNumber">Celular</Label>
         <Input
-          id="phone_number"
-          name="phone_number"
+          id="phoneNumber"
+          name="phoneNumber"
           placeholder="+57 300 1234567"
-          value={formData.phone_number}
+          value={formData.phoneNumber}
           onChange={handleInputChange}
           required
           disabled={isLoading}

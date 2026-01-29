@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -39,73 +38,14 @@ export function PaymentCard({ payment, onUpdate }: PaymentCardProps) {
 
   const handlePaymentToggle = async () => {
     setIsProcessing(true);
-    const supabase = createClient();
 
     try {
-      // Update payment status
-      const { error: paymentError } = await supabase
-        .from("payments")
-        .update({
-          was_paid: !payment.was_paid,
-          payment_date: !payment.was_paid ? new Date().toISOString() : null,
-        })
-        .eq("id", payment.id);
+      const response = await fetch(`/api/payments/${payment.id}`, {
+        method: "PUT",
+      });
 
-      if (paymentError) throw paymentError;
-
-      if (paymentError) throw paymentError;
-
-      // If marking as paid, create next month's payment
-      if (!payment.was_paid) {
-        // Create next month's payment if this was paid
-
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-        if (userError || !user) throw new Error("Usuario no autenticado");
-
-        const currentPaymentMonth = new Date(payment.payment_month);
-        // Calcular el primer día del mes siguiente
-        const nextMonthDate = new Date(
-          currentPaymentMonth.getFullYear(),
-          currentPaymentMonth.getMonth() + 1,
-          1
-        );
-        const nextPaymentMonth = nextMonthDate.toISOString().split("T")[0];
-
-        const { data: existingPayment, error: checkError } = await supabase
-          .from("payments")
-          .select("id")
-          .eq("loan_id", payment.loan_id)
-          .eq("payment_month", nextPaymentMonth)
-          .single();
-
-        if (!checkError && !existingPayment) {
-          // Get loan details to calculate interest
-          const { data: loanData, error: loanError } = await supabase
-            .from("loans")
-            .select("principal_amount, interest_rate")
-            .eq("id", payment.loan_id)
-            .single();
-
-          if (loanError) throw loanError;
-
-          const monthlyInterest =
-            (loanData.principal_amount * loanData.interest_rate) / 100;
-
-          const { error: nextPaymentError } = await supabase
-            .from("payments")
-            .insert({
-              user_id: user.id,
-              loan_id: payment.loan_id,
-              payment_month: nextPaymentMonth,
-              interest_earned: monthlyInterest,
-              was_paid: false,
-            });
-
-          if (nextPaymentError) throw nextPaymentError;
-        }
+      if (!response.ok) {
+        throw new Error("Error updating payment");
       }
 
       onUpdate();

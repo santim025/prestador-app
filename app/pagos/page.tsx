@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { DashboardNav } from "@/components/dashboard/dashboard-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -30,18 +29,16 @@ export default function PagosPage() {
   }, [])
 
   const fetchPayments = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from("payments")
-      .select("*, loans(clients(name))")
-      .order("payment_month", { ascending: false })
-
-    if (error) {
-      console.error("Error fetching payments:", error)
-    } else {
+    try {
+      const response = await fetch("/api/payments")
+      if (!response.ok) throw new Error("Error fetching payments")
+      const data = await response.json()
       setPayments(data || [])
+    } catch (error) {
+      console.error("Error fetching payments:", error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const pendingPayments = payments.filter((p) => !p.was_paid)

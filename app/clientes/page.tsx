@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { DashboardNav } from "@/components/dashboard/dashboard-nav"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -12,9 +11,9 @@ import { ClientCard } from "@/components/clients/client-card"
 interface Client {
   id: string
   name: string
-  phone_number: string
+  phoneNumber: string
   address: string
-  payage_image_url: string | null
+  payageImageUrl: string | null
 }
 
 export default function ClientesPage() {
@@ -27,15 +26,16 @@ export default function ClientesPage() {
   }, [])
 
   const fetchClients = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.from("clients").select("*").order("created_at", { ascending: false })
-
-    if (error) {
-      console.error("Error fetching clients:", error)
-    } else {
+    try {
+      const response = await fetch("/api/clients")
+      if (!response.ok) throw new Error("Error fetching clients")
+      const data = await response.json()
       setClients(data || [])
+    } catch (error) {
+      console.error("Error fetching clients:", error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleClientAdded = () => {

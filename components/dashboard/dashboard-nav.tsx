@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -26,24 +25,10 @@ const navItems = [
 
 export function DashboardNav() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string>("");
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUserEmail(user?.email || "");
-    };
-    fetchUser();
-  }, []);
+  const { data: session } = useSession();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+    await signOut({ callbackUrl: "/auth/login" });
   };
 
   return (
@@ -74,7 +59,9 @@ export function DashboardNav() {
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
               <User className="h-4 w-4 text-primary" />
             </div>
-            <span className="text-sm text-muted-foreground hidden md:inline">{userEmail}</span>
+            <span className="text-sm text-muted-foreground hidden md:inline">
+              {session?.user?.email || ""}
+            </span>
           </div>
           <Button
             variant="ghost"

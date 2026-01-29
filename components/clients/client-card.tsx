@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,9 +19,9 @@ import { User, Phone, MapPin, Trash2 } from "lucide-react"
 interface Client {
   id: string
   name: string
-  phone_number: string
+  phoneNumber: string
   address: string
-  payage_image_url: string | null
+  payageImageUrl: string | null
 }
 
 interface ClientCardProps {
@@ -35,15 +34,21 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
-    const { error } = await supabase.from("clients").delete().eq("id", client.id)
+    try {
+      const response = await fetch(`/api/clients/${client.id}`, {
+        method: "DELETE",
+      })
 
-    if (error) {
+      if (!response.ok) {
+        console.error("Error deleting client")
+      } else {
+        onUpdate()
+      }
+    } catch (error) {
       console.error("Error deleting client:", error)
-    } else {
-      onUpdate()
+    } finally {
+      setIsDeleting(false)
     }
-    setIsDeleting(false)
   }
 
   return (
@@ -62,10 +67,10 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
         </div>
 
         {/* Imagen del pagaré si existe */}
-        {client.payage_image_url && (
+        {client.payageImageUrl && (
           <div className="relative w-full h-32 bg-muted">
             <Image
-              src={client.payage_image_url || "/placeholder.svg"}
+              src={client.payageImageUrl || "/placeholder.svg"}
               alt={`Pagaré de ${client.name}`}
               fill
               className="object-cover"
@@ -77,7 +82,7 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
         <div className="p-5 space-y-3">
           <div className="flex items-center gap-3 text-sm text-gray-600">
             <Phone className="h-4 w-4 text-gray-400" />
-            <span>{client.phone_number}</span>
+            <span>{client.phoneNumber}</span>
           </div>
           <div className="flex items-center gap-3 text-sm text-gray-600">
             <MapPin className="h-4 w-4 text-gray-400" />
