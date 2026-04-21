@@ -59,11 +59,19 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-4">
+    <div className="flex min-h-screen w-full items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
+        <div className="flex justify-center mb-8">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="LendTrack"
+            style={{ height: 56, width: "auto" }}
+          />
+        </div>
         <Card>
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl">Crear cuenta</CardTitle>
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-[20px]" style={{ fontWeight: 500 }}>Crear cuenta</CardTitle>
             <CardDescription>Regístrate para comenzar a gestionar tus préstamos</CardDescription>
           </CardHeader>
           <CardContent>

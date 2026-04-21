@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { User, Calendar, Coins } from "lucide-react";
 
 interface Payment {
   id: string;
@@ -27,8 +27,6 @@ export function PaymentCard({ payment, onUpdate }: PaymentCardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const formatMonth = (dateString: string) => {
-    // Asegurar que la fecha se interprete correctamente añadiendo una hora segura (mediodía)
-    // Esto evita que '2025-11-01' se convierta en '2025-10-31 19:00' por la zona horaria
     const date = new Date(`${dateString}T12:00:00`);
     return date.toLocaleDateString("es-CO", {
       month: "long",
@@ -38,16 +36,11 @@ export function PaymentCard({ payment, onUpdate }: PaymentCardProps) {
 
   const handlePaymentToggle = async () => {
     setIsProcessing(true);
-
     try {
       const response = await fetch(`/api/payments/${payment.id}`, {
         method: "PUT",
       });
-
-      if (!response.ok) {
-        throw new Error("Error updating payment");
-      }
-
+      if (!response.ok) throw new Error("Error updating payment");
       onUpdate();
     } catch (error) {
       console.error("Error toggling payment:", error);
@@ -57,60 +50,86 @@ export function PaymentCard({ payment, onUpdate }: PaymentCardProps) {
   };
 
   return (
-    <Card
-      className={
-        payment.was_paid
-          ? "bg-green-50 dark:bg-green-950"
-          : "bg-yellow-50 dark:bg-yellow-950"
-      }
-    >
-      <CardHeader>
-        <CardTitle className="text-lg">{payment.loans.clients.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="space-y-2 text-sm">
-          <p>
-            <span className="font-semibold">Mes:</span>{" "}
-            {formatMonth(payment.payment_month)}
-          </p>
-          <p>
-            <span className="font-semibold">Interés:</span> $
-            {Number(payment.interest_earned).toLocaleString("es-CO", {
-              minimumFractionDigits: 0,
-            })}
-          </p>
-          <p>
-            <span className="font-semibold">Estado:</span>{" "}
+    <Card className="py-0 overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.14)]">
+      <CardContent className="p-0">
+        <div className="p-4 border-b border-[rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`rounded-full flex items-center justify-center flex-shrink-0 ${
+                  payment.was_paid ? "bg-[#E1F5EE]" : "bg-[#FDF1DC]"
+                }`}
+                style={{ width: 36, height: 36 }}
+              >
+                <User
+                  className={`h-4 w-4 ${
+                    payment.was_paid ? "text-[#0F6E56]" : "text-[#A06410]"
+                  }`}
+                  strokeWidth={2}
+                />
+              </div>
+              <h3
+                className="truncate"
+                style={{ fontSize: 15, fontWeight: 500 }}
+              >
+                {payment.loans.clients.name}
+              </h3>
+            </div>
             <span
-              className={`rounded px-2 py-1 text-xs font-semibold ${
+              className={`rounded-full px-2.5 py-0.5 text-[11px] ${
                 payment.was_paid
-                  ? "bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200"
-                  : "bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200"
+                  ? "bg-[#E1F5EE] text-[#0F6E56]"
+                  : "bg-[#FDF1DC] text-[#A06410]"
               }`}
+              style={{ fontWeight: 500 }}
             >
               {payment.was_paid ? "Pagado" : "Pendiente"}
             </span>
-          </p>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-2">
+          <div className="flex items-center gap-2 text-[13px] text-secondary">
+            <Calendar className="h-3.5 w-3.5 text-tertiary" strokeWidth={1.75} />
+            <span className="capitalize">{formatMonth(payment.payment_month)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-[13px] text-secondary">
+            <Coins className="h-3.5 w-3.5 text-tertiary" strokeWidth={1.75} />
+            <span className="text-foreground tabular-nums" style={{ fontWeight: 500 }}>
+              ${Number(payment.interest_earned).toLocaleString("es-CO", {
+                minimumFractionDigits: 0,
+              })}
+            </span>
+            <span>de interés</span>
+          </div>
           {payment.payment_date && (
-            <p>
-              <span className="font-semibold">Fecha de Pago:</span>{" "}
-              {new Date(payment.payment_date).toLocaleDateString("es-CO")}
-            </p>
+            <div className="flex items-center gap-2 text-[12px] text-tertiary">
+              <span>
+                Pagado el{" "}
+                {new Date(payment.payment_date).toLocaleDateString("es-CO")}
+              </span>
+            </div>
           )}
         </div>
 
-        <Button
-          onClick={handlePaymentToggle}
-          disabled={isProcessing}
-          className="w-full"
-          variant={payment.was_paid ? "outline" : "default"}
-        >
-          {isProcessing
-            ? "Procesando..."
-            : payment.was_paid
-            ? "Marcar como No Pagado"
-            : "Marcar como Pagado"}
-        </Button>
+        <div className="px-4 pb-4">
+          <button
+            onClick={handlePaymentToggle}
+            disabled={isProcessing}
+            className={
+              payment.was_paid
+                ? "w-full rounded-lg border border-[rgba(0,0,0,0.12)] py-2 text-[12px] text-secondary transition-colors hover:bg-[rgba(0,0,0,0.03)] hover:text-foreground disabled:opacity-60"
+                : "w-full rounded-lg bg-foreground text-background py-2 text-[12px] transition-opacity hover:opacity-90 disabled:opacity-60"
+            }
+            style={{ fontWeight: 500 }}
+          >
+            {isProcessing
+              ? "Procesando..."
+              : payment.was_paid
+              ? "Marcar como No Pagado"
+              : "Marcar como Pagado"}
+          </button>
+        </div>
       </CardContent>
     </Card>
   );

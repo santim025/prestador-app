@@ -3,9 +3,7 @@
 import type React from "react";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -101,8 +99,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="clientId">Cliente</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="clientId" className="form-label block">
+          Cliente
+        </label>
         <Select
           value={formData.clientId}
           onValueChange={(value) => handleSelectChange("clientId", value)}
@@ -120,8 +120,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="principalAmount">Monto del Préstamo</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="principalAmount" className="form-label block">
+          Monto del Préstamo
+        </label>
         <Input
           id="principalAmount"
           name="principalAmount"
@@ -135,8 +137,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="interestRate">Tasa de Interés Mensual (%)</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="interestRate" className="form-label block">
+          Tasa de Interés Mensual (%)
+        </label>
         <Input
           id="interestRate"
           name="interestRate"
@@ -150,8 +154,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="startDate">Fecha de Inicio</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="startDate" className="form-label block">
+          Fecha de Inicio
+        </label>
         <Input
           id="startDate"
           name="startDate"
@@ -163,10 +169,10 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="paymentFrequencyDays">
+      <div className="space-y-1.5">
+        <label htmlFor="paymentFrequencyDays" className="form-label block">
           Frecuencia de Pago (días)
-        </Label>
+        </label>
         <Select
           value={formData.paymentFrequencyDays}
           onValueChange={(value) =>
@@ -184,11 +190,16 @@ export function LoanForm({ onSuccess }: LoanFormProps) {
         </Select>
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-[12px] text-red-600">{error}</p>}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full rounded-lg bg-foreground text-background py-2.5 text-[13px] transition-opacity hover:opacity-90 disabled:opacity-60"
+        style={{ fontWeight: 500 }}
+      >
         {isLoading ? "Guardando..." : "Crear Préstamo"}
-      </Button>
+      </button>
     </form>
   );
 }

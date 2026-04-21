@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lendtrack:latest
+    container_name: lendtrack-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    volumes:
+      - ./public/uploads:/app/public/uploads
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true
+    name: shared-network

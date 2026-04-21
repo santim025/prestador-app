@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,21 +51,27 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
   }
 
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+    <Card className="py-0 overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.14)]">
       <CardContent className="p-0">
-        {/* Header con avatar e info principal */}
-        <div className="p-5 border-b border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <User className="h-6 w-6 text-blue-600" />
+        <div className="p-4 border-b border-[rgba(0,0,0,0.06)]">
+          <div className="flex items-center gap-3">
+            <div
+              className="rounded-full bg-[#E6EFFE] flex items-center justify-center flex-shrink-0"
+              style={{ width: 36, height: 36 }}
+            >
+              <User className="h-4 w-4 text-[#1E4FC4]" strokeWidth={2} />
             </div>
             <div className="min-w-0">
-              <h3 className="font-semibold text-lg text-gray-900 truncate">{client.name}</h3>
+              <h3
+                className="truncate"
+                style={{ fontSize: 15, fontWeight: 500 }}
+              >
+                {client.name}
+              </h3>
             </div>
           </div>
         </div>
 
-        {/* Imagen del pagaré si existe */}
         {client.payageImageUrl && (
           <div className="relative w-full h-32 bg-muted">
             <Image
@@ -78,30 +83,28 @@ export function ClientCard({ client, onUpdate }: ClientCardProps) {
           </div>
         )}
 
-        {/* Información de contacto */}
-        <div className="p-5 space-y-3">
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <Phone className="h-4 w-4 text-gray-400" />
+        <div className="p-4 space-y-2.5">
+          <div className="flex items-center gap-2.5 text-[13px] text-secondary">
+            <Phone className="h-3.5 w-3.5 text-tertiary" strokeWidth={1.75} />
             <span>{client.phoneNumber}</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 text-gray-400" />
+          <div className="flex items-center gap-2.5 text-[13px] text-secondary">
+            <MapPin className="h-3.5 w-3.5 text-tertiary" strokeWidth={1.75} />
             <span className="truncate">{client.address}</span>
           </div>
         </div>
 
-        {/* Acciones */}
-        <div className="px-5 pb-5">
+        <div className="px-4 pb-4">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" 
+              <button
                 disabled={isDeleting}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[rgba(0,0,0,0.12)] py-2 text-[12px] text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+                style={{ fontWeight: 500 }}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                 Eliminar
-              </Button>
+              </button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>

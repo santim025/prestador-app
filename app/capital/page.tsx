@@ -1,10 +1,11 @@
 "use client";
 
 import type React from "react";
-
 import { useEffect, useState } from "react";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
-import { Button } from "@/components/ui/button";
+import { BottomNav } from "@/components/dashboard/bottom-nav";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { StatCard } from "@/components/dashboard/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -14,11 +15,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Wallet, TrendingUp, Activity } from "lucide-react";
 
 interface Capital {
   id: string;
   initialCapital: number;
+}
+
+function formatCOP(value: number) {
+  return `$${value.toLocaleString("es-CO", { minimumFractionDigits: 0 })}`;
 }
 
 export default function CapitalPage() {
@@ -35,7 +40,6 @@ export default function CapitalPage() {
 
   const fetchCapitalData = async () => {
     try {
-      // Fetch capital
       const capitalResponse = await fetch("/api/capital");
       if (capitalResponse.ok) {
         const capitalData = await capitalResponse.json();
@@ -43,7 +47,6 @@ export default function CapitalPage() {
         setNewInitialCapital(capitalData?.initialCapital?.toString() || "0");
       }
 
-      // Fetch payments to calculate total interest
       const paymentsResponse = await fetch("/api/payments");
       if (paymentsResponse.ok) {
         const paymentsData = await paymentsResponse.json();
@@ -66,9 +69,7 @@ export default function CapitalPage() {
     try {
       const response = await fetch("/api/capital", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initialCapital: parseFloat(newInitialCapital) }),
       });
 
@@ -86,140 +87,136 @@ export default function CapitalPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Cargando...</p>
+        <p className="text-secondary text-sm">Cargando...</p>
       </div>
     );
   }
 
-  // Calcular el capital actual: capital inicial + intereses ganados
   const initialCapitalValue = Number(capital?.initialCapital || 0);
   const currentCapital = initialCapitalValue + totalInterestEarned;
-
-  // Calcular el crecimiento basado en los intereses ganados
   const growth = initialCapitalValue
     ? (totalInterestEarned / initialCapitalValue) * 100
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <DashboardNav />
 
-      <div className="space-y-6 p-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold">Mi Capital</h2>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>Actualizar Capital Inicial</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Actualizar Capital Inicial</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleUpdateInitialCapital} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="capital">Capital Inicial</Label>
-                  <Input
-                    id="capital"
-                    type="number"
-                    placeholder="0"
-                    value={newInitialCapital}
-                    onChange={(e) => setNewInitialCapital(e.target.value)}
-                    required
+      <div className="space-y-4 p-4 sm:p-6 max-w-7xl mx-auto">
+        <PageHeader
+          title="Mi Capital"
+          action={
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <button
+                  className="rounded-lg bg-foreground text-background px-4 py-2 text-[13px] transition-opacity hover:opacity-90"
+                  style={{ fontWeight: 500 }}
+                >
+                  Actualizar Capital
+                </button>
+              </DialogTrigger>
+              <DialogContent className="w-[90%] sm:w-full rounded-xl">
+                <DialogHeader>
+                  <DialogTitle
+                    className="text-[16px]"
+                    style={{ fontWeight: 500 }}
+                  >
+                    Actualizar Capital Inicial
+                  </DialogTitle>
+                </DialogHeader>
+                <form
+                  onSubmit={handleUpdateInitialCapital}
+                  className="space-y-4"
+                >
+                  <div className="space-y-2">
+                    <label htmlFor="capital" className="form-label block">
+                      Capital Inicial
+                    </label>
+                    <Input
+                      id="capital"
+                      type="number"
+                      placeholder="0"
+                      value={newInitialCapital}
+                      onChange={(e) => setNewInitialCapital(e.target.value)}
+                      required
+                      disabled={isUpdating}
+                      step="1000"
+                    />
+                    <p className="text-tertiary" style={{ fontSize: 11 }}>
+                      Este es tu dinero inicial al comenzar a prestar. El
+                      capital actual se calcula automáticamente.
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
                     disabled={isUpdating}
-                    step="1000"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Este es tu dinero inicial al comenzar a prestar. El capital
-                    actual se calcula automáticamente.
-                  </p>
-                </div>
-                <Button type="submit" className="w-full" disabled={isUpdating}>
-                  {isUpdating ? "Actualizando..." : "Guardar"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+                    className="w-full rounded-lg bg-foreground text-background py-2.5 text-[13px] transition-opacity hover:opacity-90 disabled:opacity-60"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {isUpdating ? "Actualizando..." : "Guardar"}
+                  </button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          }
+        />
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Capital Inicial
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                $
-                {initialCapitalValue.toLocaleString("es-CO", {
-                  minimumFractionDigits: 0,
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Capital Actual
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                $
-                {currentCapital.toLocaleString("es-CO", {
-                  minimumFractionDigits: 0,
-                })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Inicial + Intereses cobrados
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Crecimiento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{growth.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">
-                $
-                {totalInterestEarned.toLocaleString("es-CO", {
-                  minimumFractionDigits: 0,
-                })}{" "}
-                ganados
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
+          <StatCard
+            label="Capital Inicial"
+            value={formatCOP(initialCapitalValue)}
+            icon={Wallet}
+            tone="neutral"
+          />
+          <StatCard
+            label="Capital Actual"
+            value={formatCOP(currentCapital)}
+            subtitle="Inicial + Intereses"
+            icon={TrendingUp}
+            tone="emerald"
+          />
+          <StatCard
+            label="Crecimiento"
+            value={`${growth.toFixed(1)}%`}
+            subtitle={`${formatCOP(totalInterestEarned)} ganados`}
+            icon={Activity}
+            tone="amber"
+          />
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Información del Capital</CardTitle>
+            <CardTitle className="text-[14px]" style={{ fontWeight: 500 }}>
+              Información del Capital
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-semibold">Capital Inicial:</span> Tu
-                dinero al comenzar a prestar
-              </p>
-              <p>
-                <span className="font-semibold">Capital Actual:</span> Tu
-                capital inicial más todos los intereses cobrados
-              </p>
-              <p>
-                <span className="font-semibold">Crecimiento:</span> Porcentaje
-                de aumento desde tu capital inicial
-              </p>
-              <p className="text-muted-foreground">
-                El capital actual se calcula automáticamente cuando marcas un
-                pago como realizado.
-              </p>
-            </div>
+          <CardContent className="space-y-2 text-[13px] text-secondary">
+            <p>
+              <span className="text-foreground" style={{ fontWeight: 500 }}>
+                Capital Inicial:
+              </span>{" "}
+              Tu dinero al comenzar a prestar.
+            </p>
+            <p>
+              <span className="text-foreground" style={{ fontWeight: 500 }}>
+                Capital Actual:
+              </span>{" "}
+              Tu capital inicial más todos los intereses cobrados.
+            </p>
+            <p>
+              <span className="text-foreground" style={{ fontWeight: 500 }}>
+                Crecimiento:
+              </span>{" "}
+              Porcentaje de aumento desde tu capital inicial.
+            </p>
+            <p className="text-tertiary">
+              El capital actual se calcula automáticamente cuando marcas un pago
+              como realizado.
+            </p>
           </CardContent>
         </Card>
       </div>
+      <BottomNav />
     </div>
   );
 }

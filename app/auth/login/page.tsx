@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Mail, Lock, DollarSign } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -51,17 +51,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-4 bg-gray-50">
+    <div className="flex min-h-screen w-full items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <div className="h-20 w-20 rounded-full bg-gradient-to-br from-gray-200 to-gray-700 flex items-center justify-center animate-bounce shadow-lg animate-gradient-xy">
-            <DollarSign className="h-10 w-10 text-white" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="LendTrack"
+            style={{ height: 56, width: "auto" }}
+          />
         </div>
 
-        <Card className="border-none shadow-lg bg-card/50 backdrop-blur-sm">
-          <CardHeader className="space-y-2 text-center">
-            <CardTitle className="text-2xl font-bold">
+        <Card>
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle
+              className="text-[20px]"
+              style={{ fontWeight: 500 }}
+            >
               Bienvenido de nuevo
             </CardTitle>
             <CardDescription>

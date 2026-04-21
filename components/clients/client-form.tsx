@@ -3,9 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ClientFormProps {
@@ -94,8 +92,10 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nombre</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="name" className="form-label block">
+          Nombre
+        </label>
         <Input
           id="name"
           name="name"
@@ -107,8 +107,10 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="phoneNumber">Celular</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="phoneNumber" className="form-label block">
+          Celular
+        </label>
         <Input
           id="phoneNumber"
           name="phoneNumber"
@@ -120,8 +122,10 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="address">Dirección</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="address" className="form-label block">
+          Dirección
+        </label>
         <Textarea
           id="address"
           name="address"
@@ -133,8 +137,10 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="payage_image">Imagen del Pagaré (opcional)</Label>
+      <div className="space-y-1.5">
+        <label htmlFor="payage_image" className="form-label block">
+          Imagen del Pagaré (opcional)
+        </label>
         <Input
           id="payage_image"
           type="file"
@@ -144,11 +150,16 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
         />
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-[12px] text-red-600">{error}</p>}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full rounded-lg bg-foreground text-background py-2.5 text-[13px] transition-opacity hover:opacity-90 disabled:opacity-60"
+        style={{ fontWeight: 500 }}
+      >
         {isLoading ? "Guardando..." : "Guardar Cliente"}
-      </Button>
+      </button>
     </form>
   );
 }

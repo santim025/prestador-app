@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Prestador App',
-  description: 'Gestión de préstamos y capital',
+  title: 'LendTrack',
+  description: 'Gestión profesional de préstamos, capital y pagos',
   icons: {
     icon: '/favicon.svg',
   },

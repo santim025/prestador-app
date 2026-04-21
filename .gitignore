@@ -25,8 +25,9 @@ pnpm-debug.log*
 .env*.local
 .env
 
-# vercel
-.vercel
+# uploads (local file storage)
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # typescript
 *.tsbuildinfo

@@ -2,7 +2,36 @@
 
 Una aplicación moderna para la gestión de préstamos personales, diseñada para facilitar el seguimiento de clientes, créditos y pagos.
 
-## � Dashboard
+## Stack
+
+- Next.js 16 (App Router) + React 19 + TypeScript
+- PostgreSQL 16 + Prisma ORM
+- NextAuth.js (credenciales email/password)
+- Tailwind CSS 4 + shadcn/ui
+- Docker + Docker Compose para despliegue local
+
+## Puesta en marcha local
+
+Este proyecto depende de una BD PostgreSQL compartida que vive en `C:\Projects\docker-infra`. Lee el README de esa carpeta para arrancar la BD antes de levantar la app.
+
+Pasos resumidos:
+
+```powershell
+# 1. (una sola vez) crear la red Docker compartida
+docker network create shared-network
+
+# 2. levantar la BD central (en C:\Projects\docker-infra)
+cd C:\Projects\docker-infra ; docker compose up -d
+
+# 3. crear .env.local en la raiz de este proyecto (ver .env.example)
+
+# 4. levantar la app
+cd C:\Projects\prestador-app ; docker compose up -d --build
+```
+
+La app quedara en http://localhost:3000 (y accesible desde otros dispositivos via Tailscale usando la IP de esta PC).
+
+## Dashboard
 
 El dashboard es tu centro de control financiero. Aquí encontrarás:
 
@@ -81,10 +110,8 @@ Todos tus clientes aparecen en una lista con su información básica y el total 
     - Porcentaje de crecimiento
     - Capital disponible para nuevos préstamos
 
-## 🔐 Seguridad
+## Seguridad
 
-- Todos los datos están protegidos con autenticación de Supabase.
-- Cada usuario solo puede ver y gestionar sus propios datos.
-- Las sesiones se mantienen seguras mediante tokens encriptados.
-
-<!-- v1.0.1 -->
+- Autenticacion con NextAuth.js (JWT + credenciales email/password, passwords hasheadas con bcrypt).
+- Cada usuario solo puede ver y gestionar sus propios datos (verificado a nivel de API route).
+- Las sesiones se mantienen seguras mediante JWT firmados con `NEXTAUTH_SECRET`.
